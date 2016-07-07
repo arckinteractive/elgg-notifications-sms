@@ -1,0 +1,21 @@
+{
+	"name": "arckinteractive/notifications_sms",
+	"version": "0.0.0",
+	"type": "elgg-plugin",
+	"description": "SMS Notification API for Elgg",
+	"homepage": "http://arckinteractive.com",
+	"keywords": [
+		"elgg", "plugin", "notifications", "sms"
+	],
+	"license": "GPL-2.0",
+	"authors": [
+		{
+			"name": "Ismayil Khayredinov",
+			"email": "ismayil@arckinteractive.com"
+		}
+	],
+	"require": {
+		"php": ">=5.5",
+		"composer/installers": "~1.0"
+	}
+}
