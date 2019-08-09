@@ -10,4 +10,6 @@ return [
 	'user:set:sms_number:wrong_format' => 'SMS delivery number must start with a country code, i.e. +1',
 	'user:set:sms_number:notify' => 'Your phone number has been updated',
 	'notification:method:sms' => 'SMS',
+
+	'notifications:settings:add_url' => 'Add notification URLs to outgoing SMS messages',
 ];

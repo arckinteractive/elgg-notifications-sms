@@ -3,7 +3,7 @@
 /**
  * SMS notifications API
  *
- * @author Ismayil Khayredinov <info@arckinteractive.com>
+ * @author    Ismayil Khayredinov <info@arckinteractive.com>
  * @copyright Copyright (c) 2015, Ismayil Khayredinov
  */
 require_once __DIR__ . '/autoloader.php';
@@ -30,6 +30,7 @@ function notifications_sms_init() {
  *
  * @param \ElggUser $to   Recipient
  * @param string    $text Text of the SMS
+ *
  * @return bool
  */
 function notifications_sms_send(\ElggUser $to, $text) {
@@ -41,6 +42,7 @@ function notifications_sms_send(\ElggUser $to, $text) {
 		'to' => $to,
 		'text' => $text,
 	];
+
 	return elgg_trigger_plugin_hook('send', 'sms', $params, false);
 }
 
@@ -51,12 +53,16 @@ function notifications_sms_send(\ElggUser $to, $text) {
  * @param string $type   Hook type
  * @param bool   $result Has the notification been sent
  * @param array  $params Hook parameters
+ *
  * @return bool Was the notification handled successfully
  */
 function notifications_sms_send_hook($hook, $type, $result, $params) {
 
 	$notification = elgg_extract('notification', $params);
 	/* @var \Elgg\Notifications\Notification $notification */
+
+	$event = elgg_extract('event', $params);
+	/* @var \Elgg\Notifications\NotificationEvent $event */
 
 	if (isset($params['sms'])) {
 		$body = $params['sms'];
@@ -75,7 +81,30 @@ function notifications_sms_send_hook($hook, $type, $result, $params) {
 		return;
 	}
 
+	$url = false;
+
+	if (elgg_get_plugin_setting('add_url', 'notifications_sms', true)) {
+		$url = elgg_get_site_url();
+
+		if (isset($notification->params['url'])) {
+			$url = $notification->params['url'];
+		} else {
+			$object = $event->getObject();
+
+			if ($object instanceof ElggEntity) {
+				$url = $object->getURL();
+			}
+		}
+	}
+
+	if ($url) {
+		$url = elgg_normalize_url($url);
+		
+		$body .= ' ' . $url;
+	}
+
 	$to = $notification->getRecipient();
+
 	return notifications_sms_send($to, $body);
 }
 
@@ -106,9 +135,10 @@ function notification_sms_save_user_sms_number() {
 
 		if (0 !== strpos($sms_number, '+')) {
 			register_error(elgg_echo('user:set:sms_number:wrong_format'));
+
 			return;
 		}
-		
+
 		if ($user->setPrivateSetting('sms_number', $sms_number)) {
 			notifications_sms_send($user, elgg_echo('user:set:sms_number:notify'));
 			system_message(elgg_echo('user:set:sms_number:success'));
